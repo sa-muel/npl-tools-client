@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { User } from '@shared/entity/user.model';
 import { assign } from 'lodash';
 
@@ -38,7 +38,7 @@ export class EditUserDialogComponent {
 
         this.form = this.fb.group({
             email: [user.email],
-            username: [user.username],
+            displayName: [user.displayName],
         });
 
         this.form.controls.email.disable();

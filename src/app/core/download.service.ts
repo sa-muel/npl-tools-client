@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { DocumentDto } from '@shared/entity/document.model';
+import { DocumentDto } from '@models/document.model';
 import { saveAs } from 'file-saver';
-import { TemplateUtils } from '../tools/gen-mapper/template-utils';
-import { TemplateService } from '../tools/gen-mapper/template.service';
 import { JSONToCSV } from '../tools/gen-mapper/resources/json-to-csv';
+import { TemplateService } from '../tools/gen-mapper/template.service';
 
 
 @Injectable({

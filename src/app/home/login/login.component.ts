@@ -1,16 +1,16 @@
-import { AfterViewChecked, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '@core/authentication.service';
 import { htmlInputTypes, ValidationUtils } from '@shared/validationUtils';
-import { OAuthService } from 'angular-oauth2-oidc';
 
 @Component({
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit, AfterViewChecked {
+export class LoginComponent implements OnInit {
 
     public form: FormGroup;
     public showError: boolean;
@@ -23,6 +23,7 @@ export class LoginComponent implements OnInit, AfterViewChecked {
     public passwordField: ElementRef;
 
     constructor(
+        private fbAuth: AngularFireAuth,
         private authService: AuthenticationService,
         private router: Router,
     ) { }
@@ -31,26 +32,14 @@ export class LoginComponent implements OnInit, AfterViewChecked {
         this._createForm();
     }
 
-    // This is a hack around a current Chrome issue, not firing events after Chrome AutoFill, on IOS
-    public ngAfterViewChecked(): void {
-        if (this.emailField.nativeElement.value && !this.form.get('email').value) {
-            this.form.get('email').setValue(this.emailField.nativeElement.value);
-            this.form.get('email').updateValueAndValidity();
-        }
-
-        if (this.passwordField.nativeElement.value && !this.form.get('password').value) {
-            this.form.get('password').setValue(this.passwordField.nativeElement.value);
-            this.form.get('password').updateValueAndValidity();
-        }
-    }
-
     public onSubmit(event: Event): void {
         event.preventDefault();
         this.showError = false;
 
+        this.checkAutofill();
+
         if (this.form.valid) {
             this.isLoading = true;
-
             this.authService.authenticate(this.form.value).subscribe(
                 success => {
                     this.isLoading = false;
@@ -61,6 +50,22 @@ export class LoginComponent implements OnInit, AfterViewChecked {
                     this.showError = true;
                 }
             );
+        }
+    }
+
+    // This is a hack around a current Chrome issue, not firing events after Chrome AutoFill, on IOS
+    private checkAutofill(): void {
+        const email = this.emailField.nativeElement.value;
+        const password = this.passwordField.nativeElement.value;
+
+        if (email && !this.form.get('email').value) {
+            this.form.get('email').setValue(email);
+            this.form.get('email').updateValueAndValidity();
+        }
+
+        if (password && !this.form.get('password').value) {
+            this.form.get('password').setValue(password);
+            this.form.get('password').updateValueAndValidity();
         }
     }
 

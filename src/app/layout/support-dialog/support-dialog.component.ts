@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SupportService } from '@core/support.service';
 import { User } from '@shared/entity/user.model';
 import { htmlInputTypes, ValidationUtils } from '@shared/validationUtils';
@@ -64,7 +64,7 @@ export class SupportDialogComponent implements OnInit {
         let email: string = null;
 
         if (this.data.authenticated) {
-            name = this.data.user.username;
+            name = this.data.user.displayName;
             email = this.data.user.email;
         }
 

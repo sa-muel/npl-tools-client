@@ -5,6 +5,16 @@
 export const environment = {
     production: false,
     apiKey: 'AIzaSyCzMNmQPVY9uivoKSzoj0ACwKr-LxxcHko',
+
+    firebase: {
+        apiKey: "AIzaSyDCutXM6HLvIspocOAugvFGNlihGClhoIU",
+        authDomain: "noplacelefttools.firebaseapp.com",
+        databaseURL: "https://noplacelefttools.firebaseio.com",
+        projectId: "noplacelefttools",
+        storageBucket: "noplacelefttools.appspot.com",
+        messagingSenderId: "577517379991",
+        appId: "1:577517379991:web:692b5a267f7df40ff5a4d2"
+    }
 };
 
 /*

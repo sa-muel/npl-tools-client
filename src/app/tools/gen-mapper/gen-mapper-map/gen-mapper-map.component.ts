@@ -1,15 +1,15 @@
+import { AgmMap } from '@agm/core';
 import { Component, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { MapsService } from '@core/maps.service';
 import { Unsubscribable } from '@core/Unsubscribable';
 import { Utils } from '@core/utils';
-import { DocumentDto } from '@shared/entity/document.model';
+import { DocumentDto } from '@models/document.model';
+import { GMTemplate } from '@templates';
 import { takeUntil } from 'rxjs/operators';
-
 import { DocumentService } from '../document.service';
 import { GNode } from '../gen-mapper.interface';
 import { GenMapperService } from '../gen-mapper.service';
-import { GMTemplate } from '@templates';
-import { AgmMap } from '@agm/core';
+
 
 export interface MapMarker {
     lat: number;

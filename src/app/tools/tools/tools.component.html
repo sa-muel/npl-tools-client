@@ -22,7 +22,7 @@
          fxLayoutGap="24px">
 
     <ng-container *ngFor="let template of templatesWithIcons">
-        <mat-card [routerLink]="['/' + template.id]">
+        <mat-card [routerLink]="['/gen-mapper', template.id]">
             <img mat-card-image
                  [src]="template.settings.iconUrl"
                  alt="Photo of a Church Circles">

@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EntityService } from '@core/entity.service';
 import { Unsubscribable } from '@core/Unsubscribable';
 import { confirmPasswordValidator } from '@shared/confirm-password.validator';
-import { EntityType } from '@shared/entity/entity.model';
 import { User } from '@shared/entity/user.model';
 import { htmlInputTypes, ValidationUtils } from '@shared/validationUtils';
 import { takeUntil } from 'rxjs/operators';
@@ -30,7 +29,7 @@ export class DetailFormComponent extends Unsubscribable implements OnInit {
 
     public ngOnInit(): void {
         this.form = this.fb.group({
-            username: [this.model.username, ValidationUtils.getDefaultInputValidators(htmlInputTypes.text).concat(Validators.minLength(4))],
+            displayName: [this.model.displayName, ValidationUtils.getDefaultInputValidators(htmlInputTypes.text).concat(Validators.minLength(4))],
             email: [this.model.email, ValidationUtils.getDefaultInputValidators(htmlInputTypes.email, true)],
             password: [null],
             confirm: [null],
@@ -71,9 +70,8 @@ export class DetailFormComponent extends Unsubscribable implements OnInit {
 
         this.isSaving = true;
 
-        value.entityType = EntityType.Users;
         value.username = value.username || null;
-        value.id = this.model.id;
+        value.uid = this.model.uid;
 
         delete value.confirm;
 

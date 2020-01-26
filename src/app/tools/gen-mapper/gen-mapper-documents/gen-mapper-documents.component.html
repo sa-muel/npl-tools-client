@@ -1,11 +1,12 @@
 <mat-nav-list *ngIf="documents">
-    <ng-container *ngFor="let doc of (documents | sortByDate: 'updatedAt'); let last=last">
+    <!-- <ng-container *ngFor="let doc of (documents | sortByDate: 'updatedAt'); let last=last"> -->
+    <ng-container *ngFor="let doc of documents; let last=last">
         <mat-list-item (click)="onSelectDocument(doc)"
                        [class.active]="doc.id === document?.id"
                        disableRipple>
             <mat-icon matListIcon>folder</mat-icon>
             <h4 mat-line>{{doc.title}}</h4>
-            <p mat-line> {{doc.updatedAt | date}} </p>
+            <p mat-line> {{doc.updatedAt.toDate() | date}} </p>
             <!-- <mat-icon>chevron_right</mat-icon> -->
         </mat-list-item>
         <mat-divider *ngIf="!last"></mat-divider>

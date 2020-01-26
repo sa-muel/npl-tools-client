@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DownloadService } from '@core/download.service';
 import { LocaleService } from '@core/locale.service';
-import { DocumentDto } from '@shared/entity/document.model';
+import { DocumentDto } from '@models/document.model';
 import { GMTemplate } from '@templates';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
 import { PrintType } from '../gen-mapper.interface';

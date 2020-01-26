@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Device } from '@core/platform';
 import { Unsubscribable } from '@core/Unsubscribable';
-import { DocumentDto } from '@shared/entity/document.model';
+import { DocumentDto } from '@models/document.model';
 import { takeUntil } from 'rxjs/operators';
 import { GNode, NodeDatum } from '../gen-mapper.interface';
 import { D3NodeTree } from '../node-tree/d3-node-tree';

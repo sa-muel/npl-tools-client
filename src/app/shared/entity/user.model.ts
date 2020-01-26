@@ -1,15 +1,7 @@
-import { Entity, EntityType } from './entity.model';
-import { assign } from 'lodash';
 
-export class User extends Entity {
-    public username?: string;
+export class User {
+    public displayName?: string;
     public email: string;
-    public id: string;
+    public uid: string;
     public password?: string;
-    public entityType: EntityType = EntityType.Users;
-
-    constructor(props: object = {}) {
-        super();
-        assign(this, props);
-    }
 }

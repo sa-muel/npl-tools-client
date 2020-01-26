@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { UserResolver } from '@core/user.resolver';
-import { GenMapperTemplates, GMTemplates } from '@templates';
+import { GMTemplates } from '@templates';
 import { DetailComponent } from './account/detail/detail.component';
 import { ConfirmEmailComponent } from './home/confirm-email/confirm-email.component';
 import { ForbiddenComponent } from './home/forbidden/forbidden.component';
@@ -79,6 +79,29 @@ const appRoutes: Routes = [
                 component: ToolsComponent
             },
             {
+                path: 'gen-mapper',
+                children: [
+                    {
+                        path: '',
+                        component: ToolsComponent,
+                    },
+                    {
+                        path: ':templateId',
+                        component: GenMapperContainerComponent,
+                        children: [
+                            {
+                                path: '',
+                                component: GenMapperComponent,
+                            },
+                            {
+                                path: ':documentId',
+                                component: GenMapperComponent,
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 path: 'churchCircles',
                 component: GenMapperContainerComponent,
                 resolve: {
@@ -117,7 +140,7 @@ const appRoutes: Routes = [
                         path: ':id',
                         component: GenMapperComponent,
                         resolve: {
-                            document: GenMapperResolver
+                            // document: GenMapperResolver
                         },
                         // Configuration is for local mode
                         runGuardsAndResolvers: 'always'
@@ -142,7 +165,7 @@ const appRoutes: Routes = [
                         path: ':id',
                         component: GenMapperComponent,
                         resolve: {
-                            document: GenMapperResolver
+                            // document: GenMapperResolver
                         },
                         // Configuration is for local mode
                         runGuardsAndResolvers: 'always'

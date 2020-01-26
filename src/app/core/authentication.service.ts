@@ -1,19 +1,22 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { BaseUrl, EntityService } from '@core/entity.service';
-import { EntityType } from '@shared/entity/entity.model';
 import { User } from '@shared/entity/user.model';
+import { auth } from 'firebase/app';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-
 import { TokenService } from './token.service';
-
-
 
 export interface LoginConfig {
     email: string;
     password: string;
+}
+
+export interface SignupConfig {
+    email: string;
+    password: string;
+    displayName: string;
 }
 
 interface ResponseData {
@@ -29,38 +32,53 @@ export class AuthenticationService {
         private entityService: EntityService,
         private tokenService: TokenService,
         private http: HttpClient,
-        private router: Router
-    ) {
-
-    }
+        private router: Router,
+        private fbAuth: AngularFireAuth
+    ) { }
 
     public isAuthenticated(): boolean {
-        return this.tokenService.getValue().isAuthenticated;
+        return !!this.fbAuth.auth.currentUser;
     }
 
     public getUser(): Observable<User> {
-        return this._user.asObservable();
+        return this.fbAuth.authState
     }
 
-    public signup(value: User): Observable<User> {
-        const data = {
-            entityType: EntityType.Users,
-            username: value.username || null,
-            password: value.password,
-            email: value.email
-        } as User;
+    public signup(value: SignupConfig): Observable<User> {
+        const { email, password, displayName } = value;
 
-        return this.entityService.create<User>(data);
+        return new Observable(observer => {
+            this.fbAuth.auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential: auth.UserCredential) => {
+                    userCredential.user.updateProfile({ displayName })
+                        .then(() => {
+                            observer.next();
+                            observer.complete();
+                        });
+                })
+                .catch(() => {
+                    observer.error();
+                    observer.complete();
+                });
+
+        });
+        // return this.entityService.create<User>(data);
     }
 
     public authenticate(config: LoginConfig): Observable<any> {
         // const options = { headers: new HttpHeaders().set('Content-Type', 'application/json;charset=UTF-8') };
-        return this.http
-            .post<ResponseData>(BaseUrl + 'auth', config)
-            .pipe(tap((responseData) => {
-                this.tokenService.set(responseData.data);
-                this.refreshUser();
-            }));
+
+        return new Observable(observer => {
+            this.fbAuth.auth.signInWithEmailAndPassword(config.email, config.password)
+                .then((auth) => {
+                    observer.next();
+                    observer.complete();
+                })
+                .catch((e) => {
+                    observer.error(e);
+                    observer.complete();
+                });
+        });
     }
 
     public refreshUser(): void {
@@ -82,7 +100,7 @@ export class AuthenticationService {
     }
 
     public logout(): void {
-        this.tokenService.clear();
+        this.fbAuth.auth.signOut();
         this.router.navigate(['login']);
     }
 
@@ -95,7 +113,18 @@ export class AuthenticationService {
     }
 
     public recoverPassword(options: { email: string }): Observable<ResponseData> {
-        return this.http.post<ResponseData>(BaseUrl + 'users:forgot-password', options);
+        return new Observable(observer => {
+
+            this.fbAuth.auth.sendPasswordResetEmail(options.email)
+                .then(() => {
+                    observer.next();
+                    observer.complete();
+                })
+                .catch((e) => {
+                    observer.error(e);
+                    observer.complete();
+                });
+        });
     }
 
     public acceptEmailConfirmation(key: string): Observable<ResponseData> {

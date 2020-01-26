@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import { AuthenticationService } from '@core/authentication.service';
-import { DocumentDto } from '@shared/entity/document.model';
+import { DocumentDto } from '@models/document.model';
 import { Entity } from '@shared/entity/entity.model';
 import { assign, groupBy } from 'lodash';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { delayWhen, map, tap } from 'rxjs/operators';
 import { DocumentService } from './document.service';
 import { GNode } from './gen-mapper.interface';
+import { CSVToJSON } from './resources/csv-to-json';
+import { JSONToCSV } from './resources/json-to-csv';
 import { TemplateUtils } from './template-utils';
 import { Template } from './template.model';
-import { JSONToCSV } from './resources/json-to-csv';
-import { CSVToJSON } from './resources/csv-to-json';
 
 const storageKey = 'offline-locall-save-';
 
@@ -75,7 +75,6 @@ export class GenMapperService {
                     config.documents = docs;
                     config.template = template;
                     this.setConfig(config);
-
                 })
             );
     }
@@ -138,6 +137,10 @@ export class GenMapperService {
     }
 
     public updateDocument(doc: DocumentDto): Observable<DocumentDto> {
+        return this.documentService.updateDocument(doc);
+    }
+
+    public _updateDocument(doc: DocumentDto): Observable<DocumentDto> {
         if (!this.authService.isAuthenticated()) {
             return this.updateLocalStorage(doc);
         }

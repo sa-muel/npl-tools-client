@@ -1,6 +1,7 @@
+import { NodeDto } from "@models/node.model";
 import { HierarchyPointNode } from "d3";
 
-export interface GNode {
+export interface GNode extends NodeDto {
     id: string;
     name: string;
     parentId: any;

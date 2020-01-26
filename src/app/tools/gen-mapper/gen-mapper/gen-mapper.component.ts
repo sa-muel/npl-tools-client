@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '@core/authentication.service';
 import { LocaleService } from '@core/locale.service';
 import { Unsubscribable } from '@core/Unsubscribable';
-import { DocumentDto } from '@shared/entity/document.model';
+import { DocumentDto } from '@models/document.model';
 import { FileInputDialogComponent } from '@shared/file-input-dialog/file-input-dialog.component';
 import { cloneDeep, some } from 'lodash';
 import { Observable } from 'rxjs';
@@ -13,26 +13,19 @@ import { takeUntil, tap } from 'rxjs/operators';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateDocumentDialogComponent } from '../dialogs/create-document-dialog/create-document-dialog.component';
 import { InvalidCsvDialogComponent } from '../dialogs/invalid-csv-dialog/invalid-csv-dialog.component';
+import { PeopleGroupService } from '../dialogs/people-group-dialog/people-group.service';
 import { GenMapperContainerComponent } from '../gen-mapper-container/gen-mapper-container.component';
 import { GenMapperGraphComponent } from '../gen-mapper-graph/gen-mapper-graph.component';
 import { GenMapperView } from '../gen-mapper-view.enum';
 import { GNode } from '../gen-mapper.interface';
 import { GenMapperService } from '../gen-mapper.service';
+import { GmService } from '../gm.service';
 import { NodeClipboardService } from '../node-clipboard.service';
 import { NodeTreeService } from '../node-tree/node-tree.service';
-import {
-    SavingErrorSnackbarComponent,
-    SavingErrorSnackBarConfig
-} from '../snackbars/saving-error-snackbar/saving-error-snackbar.component';
-import { SavingSnackbarComponent, SavingSnackBarConfig } from '../snackbars/saving-snackbar/saving-snackbar.component';
-import { TemplateUtils } from '../template-utils';
-import { Template } from '../template.model';
 import { CSVToJSON } from '../resources/csv-to-json';
-import { HttpClient } from '@angular/common/http';
-import { BaseUrl } from '@core/entity.service';
-import { EntityType } from '@shared/entity/entity.model';
-import { PeopleGroupService } from '../dialogs/people-group-dialog/people-group.service';
-import { PeopleGroupDialogComponent } from '../dialogs/people-group-dialog/people-group-dialog.component';
+import { SavingErrorSnackbarComponent, SavingErrorSnackBarConfig } from '../snackbars/saving-error-snackbar/saving-error-snackbar.component';
+import { SavingSnackbarComponent, SavingSnackBarConfig } from '../snackbars/saving-snackbar/saving-snackbar.component';
+import { Template } from '../template.model';
 
 @Component({
     selector: 'app-gen-mapper',
@@ -61,6 +54,7 @@ export class GenMapperComponent extends Unsubscribable implements OnInit {
 
     constructor(
         private pgService: PeopleGroupService,
+        private gmService: GmService,
         private authService: AuthenticationService,
         private genMapper: GenMapperService,
         private route: ActivatedRoute,
@@ -77,31 +71,32 @@ export class GenMapperComponent extends Unsubscribable implements OnInit {
     }
 
     public ngOnInit(): void {
+        console.log('initGenMapper')
         // console.log('ngOnInit');
         // this.dialog.open(PeopleGroupDialogComponent);
 
-        const snapshot = this.route.snapshot;
-        const data = snapshot.parent.data;
-        this.template = data.config.template;
+        // const snapshot = this.route.snapshot;
+        // const data = snapshot.parent.data;
+        // this.template = data.config.template;
         this.isAuthenticated = this.authService.isAuthenticated();
 
-        this.nodeTree.createLayout(this.template);
-
-        if (this.template.reports) {
-            this.showReportsView = true;
-        }
-
-        this.locale.get().pipe(takeUntil(this.unsubscribe)).subscribe(() => {
-            TemplateUtils.setTemplateLocale(this.template, this.locale);
-        });
-
-        this.route.data
+        this.gmService.onDocumentsChange()
             .pipe(takeUntil(this.unsubscribe))
             .subscribe(result => {
-                this.document = result.document;
-                if (!result.document && !this.authService.isAuthenticated() && this.genMapper.hasLocalDocument()) {
-                    this.router.navigate([this.template.id, 'local'], { skipLocationChange: true });
-                }
+                this.documents = result;
+            });
+
+        this.gmService.onTemplateChange()
+            .pipe(takeUntil(this.unsubscribe))
+            .subscribe(result => {
+                this.template = result;
+                this.nodeTree.createLayout(this.template);
+            });
+
+        this.gmService.onSelectedDocumentChange()
+            .pipe(takeUntil(this.unsubscribe))
+            .subscribe(result => {
+                this.document = result;
 
                 if (this.document) {
                     if (this.nodeTree.validateTree(this.document.nodes)) {
@@ -111,23 +106,73 @@ export class GenMapperComponent extends Unsubscribable implements OnInit {
                         this.showBadDocumentDialog(this.document.content);
                     }
                 }
+            });
 
-                if (this.view === GenMapperView.Reports) {
-                    this.view = GenMapperView.GenMap;
+        this.route.params.pipe(takeUntil(this.unsubscribe))
+            .subscribe(result => {
+                this.view = GenMapperView.GenMap;
+
+                const id = result.documentId;
+
+                if (!id) {
+
+                }
+                else if (id === 'local') {
+
+                }
+                else {
+                    const fbDoc = this.gmService.loadDocument(id);
+                    fbDoc.get().subscribe(result => {
+                        const document = result.data();
+                        document.id = result.id;
+                        // console.log(document);
+                        this.gmService.setSelectedDocument(new DocumentDto({ ...document }));
+                    });
                 }
             });
 
-        this.genMapper.getNode()
-            .pipe(takeUntil(this.unsubscribe))
-            .subscribe(result => {
-                this.node = result;
-            });
+        // if (this.template.reports) {
+        //     this.showReportsView = true;
+        // }
 
-        this.genMapper.getConfig()
-            .pipe(takeUntil(this.unsubscribe))
-            .subscribe(result => {
-                this.documents = result.documents;
-            });
+        // this.locale.get().pipe(takeUntil(this.unsubscribe)).subscribe(() => {
+        //     TemplateUtils.setTemplateLocale(this.template, this.locale);
+        // });
+
+        // this.route.data
+        //     .pipe(takeUntil(this.unsubscribe))
+        //     .subscribe(result => {
+
+        //         this.document = result.document;
+        //         if (!result.document && !this.authService.isAuthenticated() && this.genMapper.hasLocalDocument()) {
+        //             this.router.navigate([this.template.id, 'local'], { skipLocationChange: true });
+        //         }
+
+        //         if (this.document) {
+        //             if (this.nodeTree.validateTree(this.document.nodes)) {
+        //                 this.nodeTree.createTree(this.document.nodes);
+        //                 this.showMapView = some(this.document.nodes, d => !!d.location);
+        //             } else {
+        //                 this.showBadDocumentDialog(this.document.content);
+        //             }
+        //         }
+
+        //         if (this.view === GenMapperView.Reports) {
+        //             this.view = GenMapperView.GenMap;
+        //         }
+        //     });
+
+        // this.genMapper.getNode()
+        //     .pipe(takeUntil(this.unsubscribe))
+        //     .subscribe(result => {
+        //         this.node = result;
+        //     });
+
+        // this.genMapper.getConfig()
+        //     .pipe(takeUntil(this.unsubscribe))
+        //     .subscribe(result => {
+        //         this.documents = result.documents;
+        //     });
     }
 
     public setView(view: GenMapperView): void {

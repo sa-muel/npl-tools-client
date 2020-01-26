@@ -1,14 +1,14 @@
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/delay';
-
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve } from '@angular/router';
-import { DocumentDto } from '@shared/entity/document.model';
+import { DocumentDto } from '@models/document.model';
 import { of } from 'rxjs';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/delay';
 import { Observable } from 'rxjs/Observable';
 import { map, take, tap } from 'rxjs/operators';
-
 import { GenMapperService } from './gen-mapper.service';
+
+
 
 @Injectable()
 export class GenMapperResolver implements Resolve<Observable<DocumentDto>> {

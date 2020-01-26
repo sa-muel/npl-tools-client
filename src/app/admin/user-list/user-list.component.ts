@@ -8,7 +8,6 @@ import { MatTableDataSource } from '@angular/material/table';
 import { EntityService } from '@core/entity.service';
 import { EntityType } from '@shared/entity/entity.model';
 import { User } from '@shared/entity/user.model';
-import { Dictionary, keyBy } from 'lodash';
 
 @Component({
     selector: 'app-user-list',
@@ -42,10 +41,10 @@ export class UserListComponent implements OnInit {
         this.dialog
             .open<EditUserDialogComponent, EditUserConfig, User>(
                 EditUserDialogComponent, {
-                    data: {
-                        user,
-                    }
+                data: {
+                    user,
                 }
+            }
             )
             .afterClosed()
             .subscribe(result => {
@@ -71,9 +70,9 @@ export class UserListComponent implements OnInit {
     }
 
     private _editUser(user: User): void {
-        this.entityService.update<User>(user).subscribe(result => {
-            this.loadUsers();
-            this.snackBar.open('You have successfully saved the User', 'Ok', { duration: 10000 });
-        });
+        // this.entityService.update<User>(user).subscribe(result => {
+        //     this.loadUsers();
+        //     this.snackBar.open('You have successfully saved the User', 'Ok', { duration: 10000 });
+        // });
     }
 }

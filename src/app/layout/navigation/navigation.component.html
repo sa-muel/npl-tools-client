@@ -7,7 +7,7 @@
         <div></div>
         <ng-container *ngIf="authenticated">
             <div *ngIf="user?.name"
-                 class="user-name">{{user.name}}</div>
+                 class="user-name">{{user.displayName}}</div>
             <div *ngIf="user?.email"
                  class="user-email">{{user.email}}</div>
             <div class="auth">
@@ -44,7 +44,7 @@
             </mat-list-item>
         </ng-container>
 
-        <mat-list-item routerLink="/tools"
+        <mat-list-item routerLink="/gen-mapper"
                        routerLinkActive="active">
             <h3 matLine>
                 {{'Common_Tools' | locale | async}}

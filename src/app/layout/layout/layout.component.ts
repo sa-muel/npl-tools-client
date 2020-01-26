@@ -3,7 +3,6 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { NavigationStart, Router } from '@angular/router';
 import { AuthenticationService } from '@core/authentication.service';
 import { LayoutService } from '@core/layout.service';
-import { TokenService } from '@core/token.service';
 import { Unsubscribable } from '@core/Unsubscribable';
 import { User } from '@shared/entity/user.model';
 import { takeUntil } from 'rxjs/operators';
@@ -25,7 +24,6 @@ export class LayoutComponent extends Unsubscribable implements OnInit {
     public matSidenav: MatSidenav;
 
     constructor(
-        private tokenService: TokenService,
         private authService: AuthenticationService,
         private layoutService: LayoutService,
         private router: Router
@@ -34,22 +32,14 @@ export class LayoutComponent extends Unsubscribable implements OnInit {
     }
 
     public ngOnInit(): void {
-
         this.layoutService.setSidenav(this.matSidenav);
-
-        this.tokenService.get()
-            .pipe(takeUntil(this.unsubscribe))
-            .subscribe(token => {
-                this.isAuthenticated = token.isAuthenticated;
-            });
 
         this.authService.getUser()
             .pipe(takeUntil(this.unsubscribe))
             .subscribe(user => {
                 this.user = user;
+                this.isAuthenticated = !!user;
             });
-
-        this.authService.refreshUser();
 
         this.router.events
             .pipe(takeUntil(this.unsubscribe))
