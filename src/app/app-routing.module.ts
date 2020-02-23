@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { UserResolver } from '@core/user.resolver';
-import { GenMapperTemplates, GMTemplates } from '@templates';
+import { GMTemplates } from '@templates';
 import { DetailComponent } from './account/detail/detail.component';
 import { ConfirmEmailComponent } from './home/confirm-email/confirm-email.component';
 import { ForbiddenComponent } from './home/forbidden/forbidden.component';
@@ -111,6 +111,31 @@ const appRoutes: Routes = [
                 },
                 data: {
                     template: GMTemplates.ChurchCircles12Template
+                },
+                children: [
+                    {
+                        path: ':id',
+                        component: GenMapperComponent,
+                        resolve: {
+                            document: GenMapperResolver
+                        },
+                        // Configuration is for local mode
+                        runGuardsAndResolvers: 'always'
+                    },
+                    {
+                        path: '',
+                        component: GenMapperComponent
+                    },
+                ]
+            },
+            {
+                path: 'churchCirclesEast',
+                component: GenMapperContainerComponent,
+                resolve: {
+                    config: GenMapperContainerResolver,
+                },
+                data: {
+                    template: GMTemplates.ChurchCirclesEastConfiguration
                 },
                 children: [
                     {
